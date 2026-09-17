@@ -74,9 +74,10 @@ You are a fashion and weather assistant.
 Use the provided weather details to suggest an outfit.
 Recommend clothing, footwear, and accessories based on temperature, humidity, and wind.
 Keep the advice practical, concise, and appropriate for everyday wear.
+Make sure that the output should be a short paragraph.
 """
 
-
+@tool
 def recommandOutfit(weather_info):
     """Recommend an outfit based on weather information."""
     messages = [
@@ -90,9 +91,9 @@ def recommandOutfit(weather_info):
     return outfit_suggestion
 
 
-models_with_tools = model.bind_tools([get_weather])
+models_with_tools = model.bind_tools([get_weather,recommandOutfit])
 
-user_query = "What is the weather in Solapur and what should I wear?"
+user_query = "What should i wear in Solapur?"
 response = models_with_tools.invoke(user_query)
 
 # print("Model response:")
@@ -108,7 +109,7 @@ if response.tool_calls:
 
         if tool_name == "get_weather":
             result = get_weather.invoke(tool_args)
-            recommandOutfitResponse = recommandOutfit(result)
+            recommandOutfitResponse = recommandOutfit.invoke({'weather_info':result})
             print(recommandOutfitResponse)
         else:
             result = "Unknown tool"
